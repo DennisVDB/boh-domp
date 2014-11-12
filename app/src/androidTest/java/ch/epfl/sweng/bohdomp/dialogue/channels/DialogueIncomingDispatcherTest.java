@@ -11,7 +11,6 @@ import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
 
 public class DialogueIncomingDispatcherTest extends AndroidTestCase {
-
     public void testNullArgsReceiveMessage() throws Exception {
         ContactFactory contactFactory = new ContactFactory(getContext());
         Contact contact = contactFactory.contactFromNumber("123");
