@@ -3,7 +3,6 @@ package ch.epfl.sweng.bohdomp.dialogue.channels;
 import android.test.AndroidTestCase;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.ContactFactory;
