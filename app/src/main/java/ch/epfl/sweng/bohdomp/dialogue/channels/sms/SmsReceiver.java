@@ -17,7 +17,8 @@ import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
  * Defines an Sms Broadcast Receiver
  */
 public final class SmsReceiver extends BroadcastReceiver {
-    private  ContactFactory contactFactory = null;
+    private  ContactFactory mContactFactory = null;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (context == null) {
@@ -27,8 +28,8 @@ public final class SmsReceiver extends BroadcastReceiver {
             throw new NullArgumentException("intent");
         }
 
-        if (contactFactory == null) {
-            contactFactory = new ContactFactory(context);
+        if (mContactFactory == null) {
+            mContactFactory = new ContactFactory(context);
         }
 
         SmsMessage[] smsMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
@@ -42,7 +43,7 @@ public final class SmsReceiver extends BroadcastReceiver {
         }
     }
     private DialogueTextMessage convertFromSmsMessage(SmsMessage smsMessage) {
-        Contact contact = contactFactory.contactFromNumber(smsMessage.getDisplayOriginatingAddress());
+        Contact contact = mContactFactory.contactFromNumber(smsMessage.getDisplayOriginatingAddress());
         String stringBody = smsMessage.getMessageBody();
 
         return new DialogueTextMessage(contact, stringBody, DialogueMessage.MessageStatus.INCOMING);
