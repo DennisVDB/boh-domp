@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
+import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
@@ -55,6 +56,8 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
         Contract.throwIfArgNull(context, "context");
         Contract.throwIfArgNull(intent, "intent");
 
+        Log.d("BLA", "sent called");
+
         if (intent.getAction().equals(ACTION_SMS_SENT)) {
             switch (getResultCode()) {
                 case Activity.RESULT_OK:
@@ -69,11 +72,23 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
                     break;
             }
 
+            Log.d("BLA", "in action");
+
+
             partsReceived += 1;
 
             if (partsReceived == mNParts) {
+                Log.d("BLA", "ended");
+
+
                 if (hasSucceeded) {
+
+                    Log.d("BLA", "succeeded");
+
                     DialogueMessage message = DialogueMessage.extractMessage(intent);
+
+                    Log.d("ID", message.getId().toString());
+
                     DefaultDialogData.getInstance().setMessageStatus(message, DialogueMessage.MessageStatus.SENT);
 
                     writeToSmsProvider(context, message);

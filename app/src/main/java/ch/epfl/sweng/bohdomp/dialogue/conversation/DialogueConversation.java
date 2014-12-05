@@ -2,6 +2,7 @@ package ch.epfl.sweng.bohdomp.dialogue.conversation;
 
 import android.content.Context;
 import android.os.Parcel;
+import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -168,7 +169,10 @@ public final class DialogueConversation implements Conversation {
         Contract.throwIfArgNull(status, "status");
 
         for (DialogueMessage m : mMessages) {
+            Log.d("ID", "here");
+
             if (m.getId().equals(message.getId()) && m.getStatus() != status) {
+                Log.d("ID", "found");
                 m.setStatus(status);
                 notifyListeners();
             }

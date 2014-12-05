@@ -42,7 +42,7 @@ public abstract class DialogueMessage implements Parcelable {
     private final Contact mContact;
     private final Contact.ChannelType mChannel;
     private final Contact.PhoneNumber mPhoneNumber;
-    private final MessageBody mBody;
+    private MessageBody mBody;
     private final DateTime mTimestamp;
     private final DialogueMessageId mId;
     private MessageStatus mStatus;
@@ -80,7 +80,6 @@ public abstract class DialogueMessage implements Parcelable {
         this.mStatus = MessageStatus.IN_TRANSIT;
         this.mIsDataMessage = isDataMessage;
     }
-
 
     /**
      * Getter for the mContact message
@@ -121,6 +120,10 @@ public abstract class DialogueMessage implements Parcelable {
      */
     public DateTime getTimeStamp() {
         return mTimestamp;
+    }
+
+    public MessageBody getPlainTextBody() {
+        return getBody();
     }
 
     /**
@@ -208,6 +211,10 @@ public abstract class DialogueMessage implements Parcelable {
         Contract.throwIfArgNull(status, "status");
 
         this.mStatus = status;
+    }
+
+    public void setBody(String body) {
+        this.mBody = newBody(body);
     }
 
     /**

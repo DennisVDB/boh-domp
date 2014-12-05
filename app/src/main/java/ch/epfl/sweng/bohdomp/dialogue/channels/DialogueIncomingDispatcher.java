@@ -39,23 +39,11 @@ public final class DialogueIncomingDispatcher extends IntentService{
         Contract.throwIfArg(message.getDirection() == DialogueMessage.MessageDirection.OUTGOING,
                 "An outgoing message should not arrive to the incoming dispatcher");
 
-        CryptoService.startActionDecrypt(context, message.getBody().getMessageBody(), new ResultReceiver(null) {
-            @Override
-            protected void onReceiveResult(int resultCode, Bundle resultData) {
-                if (resultCode == CryptoService.RESULT_SUCCESS) {
-                    String decryptedText = resultData.getString(CryptoService.EXTRA_CLEAR_TEXT);
-                    DialogueMessage decryptedMessage = new DialogueTextMessage(message.getContact(),
-                            message.getChannel(), message.getPhoneNumber(),
-                            decryptedText, DialogueMessage.MessageDirection.INCOMING);
-
-                    /* Create intent and send to myself */
-                    Intent intent = new Intent(context, DialogueIncomingDispatcher.class);
-                    intent.setAction(ACTION_RECEIVE_MESSAGE);
-                    intent.putExtra(DialogueMessage.MESSAGE, decryptedMessage);
-                    context.startService(intent);
-                }
-            }
-        });
+        /* Create intent and send to myself */
+        Intent intent = new Intent(context, DialogueIncomingDispatcher.class);
+        intent.setAction(ACTION_RECEIVE_MESSAGE);
+        intent.putExtra(DialogueMessage.MESSAGE, message);
+        context.startService(intent);
     }
 
     public static boolean isRunning() {
@@ -84,6 +72,5 @@ public final class DialogueIncomingDispatcher extends IntentService{
     public void onDestroy() {
         super.onDestroy();
         sIsRunning = false;
-
     }
 }

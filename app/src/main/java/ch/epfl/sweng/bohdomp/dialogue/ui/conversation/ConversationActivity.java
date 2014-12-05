@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import ch.epfl.sweng.bohdomp.dialogue.data.StorageManager;
 import ch.epfl.sweng.bohdomp.dialogue.ids.ConversationId;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.EncryptedDialogueTextMessage;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -150,8 +152,16 @@ public class ConversationActivity extends Activity implements ConversationListen
                 Contract.assertNotNull(number, "number");
 
                 for (Contact contact : mConversation.getContacts()) {
-                    DialogueMessage message = new DialogueTextMessage(contact, channel, number,
-                            draftText, DialogueMessage.MessageDirection.OUTGOING);
+                    DialogueMessage message = new EncryptedDialogueTextMessage(getApplicationContext(),
+                            contact, channel, number, draftText, DialogueMessage.MessageDirection.OUTGOING);
+
+                    Contract.assertNotNull(message, "message");
+//                    Contract.assertNotNull(message.getBody(), "body");
+//                    Contract.assertNotNull(message.getPlainTextBody(), "plaintext");
+
+                    Log.d("BLA", message.getBody().toString());
+
+                    Log.d("ID", message.getId().toString());
 
                     DialogueOutgoingDispatcher.sendMessage(view.getContext(), message,
                             mConversation.getEncrypt());

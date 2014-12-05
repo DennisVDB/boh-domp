@@ -145,7 +145,10 @@ public class MessagesAdapter extends BaseAdapter {
         Contract.assertNotNull(msg, "message");
         Contract.assertNotNull(viewHolder, "viewHolder");
 
-        String body = msg.getBody().getMessageBody();
+        Contract.assertNotNull(msg.getPlainTextBody(), "plaintext");
+        Contract.assertNotNull(msg.getPlainTextBody().getMessageBody(), "body");
+
+        String body = msg.getPlainTextBody().getMessageBody();
         viewHolder.body.setText(body);
         viewHolder.timeStamp.setText(msg.prettyTimeStamp(mContext));
         viewHolder.wrapper.clearAnimation();
@@ -162,6 +165,7 @@ public class MessagesAdapter extends BaseAdapter {
                     anim(viewHolder, msg);
                     break;
                 case SENT:
+                    viewHolder.anim = false;
                     break;
                 case DELIVERED:
                     viewHolder.anim = false;

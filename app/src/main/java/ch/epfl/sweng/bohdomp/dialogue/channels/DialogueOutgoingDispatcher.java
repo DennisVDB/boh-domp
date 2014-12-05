@@ -63,7 +63,6 @@ public final class DialogueOutgoingDispatcher extends IntentService {
                     throw new IllegalStateException("not valid channel");
             }
         }
-
     }
 
     private void sendSms(final DialogueMessage message, boolean crypt) {
@@ -72,30 +71,7 @@ public final class DialogueOutgoingDispatcher extends IntentService {
 
         Log.i("DialogueOutgoingDispatcher", "3");
 
-        if (crypt) {
-
-            CryptoService.startActionEncrypt(getApplicationContext(), KeyManager.FINGERPRINT,
-                    message.getBody().getMessageBody(),
-
-                    new ResultReceiver(null) {
-                        @Override
-                        protected void onReceiveResult(final int resultCode, final Bundle resultData) {
-                            if (resultCode == CryptoService.RESULT_SUCCESS) {
-                                String encryptedText = resultData.getString(CryptoService.EXTRA_ENCRYPTED_TEXT);
-                                DialogueMessage encryptedMessage = new DialogueTextMessage(message.getContact(),
-                                        message.getChannel(), message.getPhoneNumber(),
-                                        encryptedText, DialogueMessage.MessageDirection.OUTGOING);
-
-                                sendMessage(encryptedMessage);
-                            }
-                        }
-                    });
-        } else {
-            sendMessage(message);
-        }
-    }
-
-    private void sendMessage(DialogueMessage message) {
+        /* Create intent and send to SmsSenderService */
         Intent intent = new Intent(getApplicationContext(), SmsSenderService.class);
         intent.setAction(SmsSenderService.ACTION_SEND_SMS);
         intent.putExtra(DialogueMessage.MESSAGE, message);
