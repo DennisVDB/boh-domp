@@ -14,7 +14,7 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
  * return by the sms manager when sending a sms message.
  */
 public final class SmsDeliveryBroadcastReceiver extends BroadcastReceiver {
-    private static final String ACTION_SMS_DELIVERED = "SMS_DELIVERED";
+    public static final String ACTION_SMS_DELIVERED = "SMS_DELIVERED";
 
     private int mNParts;
     private int partsReceived = 0;

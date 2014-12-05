@@ -16,7 +16,6 @@ import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.PhoneNumber;
 import ch.epfl.sweng.bohdomp.dialogue.ids.ConversationId;
 import ch.epfl.sweng.bohdomp.dialogue.ids.IdManager;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
-
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -110,7 +109,7 @@ public final class DialogueConversation implements Conversation {
     }
 
     @Override
-    public Boolean getEncrypt() {
+    public Boolean needEncryption() {
         return mEncrypt;
     }
 

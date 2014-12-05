@@ -4,13 +4,16 @@ package ch.epfl.sweng.bohdomp.dialogue.channels;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.ResultReceiver;
+import android.util.Log;
+import android.widget.Toast;
 
-import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoService;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoException;
+
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.TextMessageBody;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -27,6 +30,7 @@ public final class DialogueIncomingDispatcher extends IntentService {
 
     /**
      * Handles the incoming messages.
+     *
      * @param context of the application.
      * @param message to be received.
      */
@@ -36,23 +40,11 @@ public final class DialogueIncomingDispatcher extends IntentService {
         Contract.throwIfArg(message.getDirection() == DialogueMessage.MessageDirection.OUTGOING,
                 "An outgoing message should not arrive to the incoming dispatcher");
 
-        CryptoService.startActionDecrypt(context, message.getBody().getMessageBody(), new ResultReceiver(null) {
-            @Override
-            protected void onReceiveResult(int resultCode, Bundle resultData) {
-                if (resultCode == CryptoService.RESULT_SUCCESS) {
-                    String decryptedText = resultData.getString(CryptoService.EXTRA_CLEAR_TEXT);
-                    DialogueMessage decryptedMessage = new DialogueTextMessage(message.getContact(),
-                            message.getChannel(), message.getPhoneNumber(),
-                            decryptedText, DialogueMessage.MessageDirection.INCOMING);
-
-                    /* Create intent and send to myself */
-                    Intent intent = new Intent(context, DialogueIncomingDispatcher.class);
-                    intent.setAction(ACTION_RECEIVE_MESSAGE);
-                    intent.putExtra(DialogueMessage.MESSAGE, decryptedMessage);
-                    context.startService(intent);
-                }
-            }
-        });
+        /* Create intent and send to myself */
+        Intent intent = new Intent(context, DialogueIncomingDispatcher.class);
+        intent.setAction(ACTION_RECEIVE_MESSAGE);
+        intent.putExtra(DialogueMessage.MESSAGE, message);
+        context.startService(intent);
     }
 
     public static boolean isRunning() {
@@ -67,20 +59,42 @@ public final class DialogueIncomingDispatcher extends IntentService {
 
             DialogueMessage message = DialogueMessage.extractMessage(intent);
 
+            TextMessageBody decryptedBody = null;
+
+            if (Crypto.isEncrypted(message.getBody().getMessageBody())) {
+                try {
+                    decryptedBody = new TextMessageBody(Crypto.decrypt(getApplicationContext(),
+                            message.getBody().getMessageBody()));
+
+                    DialogueMessage decryptedMessage = new DialogueTextMessage(message.getContact(),
+                            message.getChannel(), message.getPhoneNumber(), decryptedBody.getMessageBody(),
+                            message.getDirection());
+
+                    DefaultDialogData.getInstance().addMessageToConversation(decryptedMessage);
+                } catch (CryptoException e) {
+                    Log.e("DECRYPTION", "decryption failed", e);
+                    Toast.makeText(getApplicationContext(),
+                            "Could not decrypt message from" + message.getContact().getDisplayName(),
+                            Toast.LENGTH_SHORT).show();
+
+                    /* Add encrypted message so that we don't lose it. */
+                    DefaultDialogData.getInstance().addMessageToConversation(message);
+                }
+            } else {
+                DefaultDialogData.getInstance().addMessageToConversation(message);
+            }
+
             Notificator notificator = new Notificator(getApplicationContext());
             notificator.update(message);
-
-            DefaultDialogData.getInstance().addMessageToConversation(message);
-
-            sIsRunning = true;
         }
         //ignore when receiving other commands
+
+        sIsRunning = true;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         sIsRunning = false;
-
     }
 }

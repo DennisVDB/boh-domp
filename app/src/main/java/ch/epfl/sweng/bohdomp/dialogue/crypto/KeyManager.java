@@ -4,54 +4,33 @@ import android.content.Context;
 
 import org.bouncycastle.openpgp.PGPException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import ch.epfl.sweng.bohdomp.dialogue.crypto.hkp.Client;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.hkp.HkpServerException;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.KeyChain;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.KeyChainBuilder;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.KeyNotFoundException;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyChain;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyChainBuilder;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyRing;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyChain;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyChainBuilder;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
- * Utility class to manage storage of keyrings.
+ * Utility class to manage storage and retrieval of keyrings.
  */
 public class KeyManager {
 
     public final static String FINGERPRINT = "6551 C260 FF5C CEBB EE37 83D1 DE75 B27E 59C6 7511";
 
     public final static String PASSPHRASE = "demo";
-
-    public final static String PUBLIC_KEY_RING = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
-            + "Version: GnuPG v1\n"
-            + "\n"
-            + "mQENBFRqKgcBCAD2hCZDhrlHVGG2Rwtj9Q56aoUy/N7VMg4Dq1I8JpZBRNnlR5CM\n"
-            + "t3TaJ94OZRjqpZawGWNms6sDKxI7u6KQAkuRedDpMNhql+7ULR9BWVOLD5g41MWa\n"
-            + "scFz/UCISmxewQPnmHfJDYDVS1UPu3gr6W057hXF2rLV7+9yRxYW4mAY+KXDGjvV\n"
-            + "6GQou0cmmeTZZYR8ZuJapCjBqJ7HUsa12Dg4T+z342U/OtBSfoWLMOOtet2LvOg0\n"
-            + "nBSfFy01xIfEcdhfxBdwUvOBqJOt/e+RofaPB0mR2rT6/bBRIJIyY+pp/dkewPnP\n"
-            + "XJd8mp60tlTT97Nw1Q3t1yj+p/290fyHB8UTABEBAAG0I0pvaG4gV2hpdGUgPGpv\n"
-            + "aG4ud2hpdGVAZXhhbXBsZS5jb20+iQE4BBMBAgAiBQJUaioHAhsDBgsJCAcDAgYV\n"
-            + "CAIJCgsEFgIDAQIeAQIXgAAKCRDedbJ+WcZ1ETypCACzRBZiA4ouIK7t17djQaxG\n"
-            + "IXUgwopxABq6TthjcMdbQz2BDW1yQP9MjVjyEPTfWZ/lzW5EITQ5GR+dp8pc420P\n"
-            + "QIisWNnE+NUH0eK5vWxke592TjLlvoojDF8HAaif+IjlXB5i2RkkgZOt6IYoUKu6\n"
-            + "UCAvnS8SOoW0YecYxvmv9VE6xnd/Ufp1I5RdbZKgVH2YrWcQwLwzUWpSlJhHEhqC\n"
-            + "hWgw/1q+tbdlwuPLNZyxZPZJAV8omqo4pU/Kf8dt8Kfmwqo9AUTWhX0wkXGkriN/\n"
-            + "fMLFeDrG0aybGb2Ik8s97W3eQeigDCItKCTTxs3Wl6afwt6wjEGxlSlY2e3NYU5B\n"
-            + "uQENBFRqKgcBCADi69fi2Uhxm4DRt3mSrvgevzY0/ophzwUcWsjaz17gAXG0LIfV\n"
-            + "jsgHWo1Sml2/jB5N3BQmN/caE7Ockj1SVb/pK4yWAk/8DmHmrCPRtp/0laOgZD4e\n"
-            + "XWoaBSnTprLXvNizaRWJTbdFJAJIP6XsiepPXTJUM8GQibSOCXC/YJNSD4ynvv0s\n"
-            + "pbN/gbHobP87pYbBQcQJsut8NluyG9bk7C5IKZ3EcmReh/weQoXLAweCu0/M4r+C\n"
-            + "ezOcS+FSK1+uLM92UB/XvUgeuyhwG3KcslT2Hl/snHAwdF0MOsMYj5c8I7raTQVJ\n"
-            + "DzREzCYdl99jBdVXPI2Vk7qcPGWpL64H25iNABEBAAGJAR8EGAECAAkFAlRqKgcC\n"
-            + "GwwACgkQ3nWyflnGdRGFSQf/RRQdroYDFkM3KrbRY9p0xNqyncxao8AQZqHCzV3D\n"
-            + "qW7nUadGv2+2ugSLgPoEfrA7f+FLjIjBXZE0BciLHThw9m7lIexIf/USzB2tTqCA\n"
-            + "3Nm+Rl8gCYHvVAulbjfweo5/dhfpiOIYZ/w2qD64oMBJpWO3RArc83goBmc4DS/a\n"
-            + "vj1e7GQGR24n0yxSsteFzeVyQNnqJYIkFQLjNjp5q4HgGIljq4EJc6DoJD5lvAtV\n"
-            + "HFmaP+XEH5QB8jEl//P13LyicOExJnmW7wbs3fba0uuq52vyEFiV6l39b13Eju9A\n"
-            + "i58tXUiHcsLyAfkUA/+DJ47XTuQqykXrUWQPdstlDwMlPA==\n"
-            + "=TnUp\n"
-            + "-----END PGP PUBLIC KEY BLOCK-----\n";
 
     public final static String SECRET_KEY_RING = "-----BEGIN PGP PRIVATE KEY BLOCK-----\n"
             + "Version: GnuPG v1\n"
@@ -113,19 +92,25 @@ public class KeyManager {
             + "=4Swq\n"
             + "-----END PGP PRIVATE KEY BLOCK-----\n";
 
-    private Context mContext;
+
+    private final static String KEY_SERVER = "pgp.mit.edu"; //TODO make user configurable
+    private final static String PUBLIC_KEY_CHAIN_PATH = "pubring.asc";
+
+    private final Context mContext;
+    private final Client mHkpClient;
 
     public KeyManager(Context context) {
         Contract.throwIfArgNull(context, "context");
 
         mContext = context;
+        mHkpClient = new Client(KEY_SERVER);
     }
 
-    /*
-    private <T extends KeyChain<?>> T getKeyChain(String path, KeyChainBuilder<T> builder)
+    /** Loads a key chain into this key manager. */
+    private <T extends KeyChain<?>> T loadKeyChain(String name, KeyChainBuilder<T> builder)
         throws IOException, PGPException {
 
-        File keyRingFile = new File(mContext.getExternalFilesDir(null), path);
+        File keyRingFile = new File(mContext.getFilesDir(), name);
         InputStream keyRingStream = null;
         try {
             keyRingStream = new FileInputStream(keyRingFile);
@@ -137,16 +122,47 @@ public class KeyManager {
                 keyRingStream.close();
             }
         }
-    }*/
+    }
 
-    public PublicKeyChain getPublicKeyChain()
-        throws FileNotFoundException, IOException, PGPException {
-        //return getKeyChain(PUBLIC_KEY_RING, new PublicKeyChainBuilder());
-        return new PublicKeyChainBuilder().fromString(PUBLIC_KEY_RING);
+    /** Saves a key chain. */
+    private void saveKeyChain(String name, KeyChain<?> chain) throws IOException {
+        File keyRingFile = new File(mContext.getFilesDir(), name);
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(keyRingFile);
+            output.write(chain.toArmored().getBytes());
+        } finally {
+            if (output != null) {
+                output.close();
+            }
+        }
+    }
+
+    /** Get a remote keyring identified by a fingerprint. This key can either be available locally
+     * or online.
+     * @return the public keyring matching the given fingerpint */
+    public PublicKeyRing getPublicKeyRing(String fingerprint)
+        throws IOException, PGPException, HkpServerException, KeyNotFoundException {
+
+        Contract.throwIfArgNull(fingerprint, "fingerprint");
+
+        PublicKeyChain localChain = loadKeyChain(PUBLIC_KEY_CHAIN_PATH, new PublicKeyChainBuilder());
+
+        PublicKeyRing ring = null;
+        try {
+            ring = localChain.getKeyRing(fingerprint);
+        } catch (KeyNotFoundException ex) {
+            PublicKeyRing remoteRing = mHkpClient.lookupKeyRing(fingerprint);
+            PublicKeyChain updated = localChain.add(remoteRing);
+            saveKeyChain(PUBLIC_KEY_CHAIN_PATH, updated);
+            ring = remoteRing;
+        }
+
+        return ring;
     }
 
     public SecretKeyChain getSecretKeyChain()
-        throws FileNotFoundException, IOException, PGPException {
+        throws IOException, PGPException {
         //return getKeyChain(SECRET_KEY_RING, new SecretKeyChainBuilder());
         return new SecretKeyChainBuilder().fromString(SECRET_KEY_RING);
     }

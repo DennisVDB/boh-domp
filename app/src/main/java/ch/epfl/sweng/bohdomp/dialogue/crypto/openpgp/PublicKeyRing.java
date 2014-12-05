@@ -18,6 +18,16 @@ public class PublicKeyRing implements KeyRing<PublicKey> {
 
     private final PGPPublicKeyRing mUnderlying;
 
+    /**
+     * Returns the underlying pgp keyring.
+     * Since bouncy castle's public and secret keys have no common ancestors, and this project's
+     * crypto API should not expose its internal dependencies, factoring this method out to a common
+     * super-class is not possible.
+     * */
+    PGPPublicKeyRing getUnderlying() {
+        return mUnderlying;
+    }
+
     PublicKeyRing(PGPPublicKeyRing underlyingKeyRing) {
         Contract.throwIfArgNull(underlyingKeyRing, "underlyingKeyRing");
 

@@ -19,7 +19,7 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "SmsSentBroadcastReceiver";
 
-    private static final String ACTION_SMS_SENT = "SMS_SENT";
+    public static final String ACTION_SMS_SENT = "SMS_SENT";
 
     private int mNParts;
     private int partsReceived = 0;
@@ -83,7 +83,7 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
         ContentValues values = new ContentValues();
 
         values.put("address", message.getPhoneNumber().getNumber());
-        values.put("body", message.getBody().getMessageBody());
+        values.put("body", message.getPlainTextBody().getMessageBody());
 
         context.getContentResolver().insert(Telephony.Sms.Sent.CONTENT_URI, values);
     }

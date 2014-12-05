@@ -29,7 +29,7 @@ public abstract class DialogueMessage implements Parcelable {
      * Enumeration representing the state of a message.
      */
     public static enum MessageStatus {
-        SENT, DELIVERED, IN_TRANSIT, FAILED
+        SENT, DELIVERED, IN_TRANSIT, FAILED, ENCRYPTION_FAILED
     }
 
     /**
@@ -61,8 +61,9 @@ public abstract class DialogueMessage implements Parcelable {
     public static DialogueMessage extractMessage(Intent intent) {
         Contract.throwIfArgNull(intent, "intent");
 
-        return (DialogueMessage) intent.getExtras().getParcelable(MESSAGE);
+        return intent.getExtras().getParcelable(MESSAGE);
     }
+
 
     DialogueMessage(Contact contact, ChannelType channel, PhoneNumber phoneNumber,
                     String messageBody, MessageDirection messageDirection, boolean isDataMessage) {
@@ -76,13 +77,12 @@ public abstract class DialogueMessage implements Parcelable {
         this.mPhoneNumber = phoneNumber;
         this.mBody = newBody(messageBody);
         this.mTimestamp = new DateTime();
-        this.mId = IdManager.getInstance().newDialogueMessageId();
         this.mIsReadStatus = false;
         this.mDirection = messageDirection;
         this.mStatus = MessageStatus.IN_TRANSIT;
         this.mIsDataMessage = isDataMessage;
+        this.mId = IdManager.getInstance().newDialogueMessageId();
     }
-
 
     /**
      * Getter for the mContact message
@@ -123,6 +123,10 @@ public abstract class DialogueMessage implements Parcelable {
      */
     public DateTime getTimeStamp() {
         return mTimestamp;
+    }
+
+    public MessageBody getPlainTextBody() {
+        return mBody;
     }
 
     /**
@@ -210,6 +214,10 @@ public abstract class DialogueMessage implements Parcelable {
         Contract.throwIfArgNull(status, "status");
 
         this.mStatus = status;
+    }
+
+    public void setBody(String body) {
+        this.mBody = newBody(body);
     }
 
     /**

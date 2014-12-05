@@ -10,6 +10,7 @@ import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.bc.BcPGPObjectFactory;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
+import org.bouncycastle.util.encoders.DecoderException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -73,8 +74,17 @@ public abstract class SecretKeyLike {
 
     /** Decode an input stream into a collection of encypted data packets. */
     private static PGPEncryptedDataList decode(InputStream encrypted) throws IOException, PGPException {
-        InputStream decoded = PGPUtil.getDecoderStream(encrypted);
-        return extractPgpData(decoded);
+        InputStream decoded = null;
+        try {
+            decoded = PGPUtil.getDecoderStream(encrypted);
+            return extractPgpData(decoded);
+        } catch (DecoderException ex) { //bouncy castle is inconsistent and throws a single unchecked exception
+            throw new PGPException("Cannot decode message. Is it encrypted?", ex);
+        } finally {
+            if (decoded != null) {
+                decoded.close();
+            }
+        }
     }
 
     /** Regroups a datapacket that can be decrypted and the matching private key. */
@@ -99,7 +109,7 @@ public abstract class SecretKeyLike {
 
     /** Find the first packet that this SecretKeyLike can decrypt. */
     private Decryptable findDecryptable(PGPEncryptedDataList encryptedDataList, char[] passphrase)
-        throws IncorrectPassphraseException, PGPException {
+        throws IncorrectPassphraseException, PGPException, KeyNotFoundException {
 
         @SuppressWarnings("unchecked") // bouncy castle returns a raw iterator
         Iterator<PGPPublicKeyEncryptedData> pgpDataIterator = encryptedDataList.getEncryptedDataObjects();
@@ -112,7 +122,7 @@ public abstract class SecretKeyLike {
         }
 
         if (priv == null) {
-            throw new PGPException("No secret key found that can decrypt this message");
+            throw new KeyNotFoundException("No secret key found that can decrypt this message");
         }
 
         return new Decryptable(data, priv);
@@ -142,7 +152,7 @@ public abstract class SecretKeyLike {
      *                   passphrase)
      */
     private void decrypt(InputStream encrypted, OutputStream decrypted, String passphrase)
-        throws IOException, PGPException, IncorrectPassphraseException {
+        throws IOException, PGPException, IncorrectPassphraseException, KeyNotFoundException {
 
         PGPEncryptedDataList decoded = decode(encrypted);
 
@@ -155,7 +165,7 @@ public abstract class SecretKeyLike {
     }
 
     private String decryptUnsafe(String message, String passphrase)
-        throws PGPException, IncorrectPassphraseException, IOException {
+        throws PGPException, IncorrectPassphraseException, IOException, KeyNotFoundException {
 
         byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
         InputStream in = new ByteArrayInputStream(bytes);
@@ -174,7 +184,7 @@ public abstract class SecretKeyLike {
      * Decrypt a message with this secret key
      */
     public String decrypt(String message, String passphrase)
-        throws PGPException, IncorrectPassphraseException {
+        throws PGPException, IncorrectPassphraseException, KeyNotFoundException {
 
         Contract.throwIfArgNull(message, "message");
         Contract.throwIfArgNull(passphrase, "passphrase");

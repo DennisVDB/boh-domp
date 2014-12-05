@@ -1,0 +1,114 @@
+package ch.epfl.sweng.bohdomp.dialogue.messaging;
+
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
+import ch.epfl.sweng.bohdomp.dialogue.conversation.ChannelType;
+import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
+import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.PhoneNumber;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoException;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.KeyManager;
+import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
+import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
+
+/**
+ * Encrypted version of a DialogueTextMessage.
+ * The message is encrypted only when it is first needed.
+ */
+public class EncryptedDialogueTextMessage extends DialogueMessage {
+    private Context mContext;
+
+    private String mMessageBody;
+    private TextMessageBody mEncryptedBody;
+    private boolean mHasBeenEncrypted;
+
+    public EncryptedDialogueTextMessage(Context context, Contact contact, ChannelType channel,
+                                        PhoneNumber phoneNumber, String messageBody,
+                                        MessageDirection messageDirection) {
+
+        super(contact, channel, phoneNumber, messageBody, messageDirection, false);
+
+        Contract.throwIfArgNull(context, "context");
+
+        this.mContext = context;
+        this.mMessageBody = messageBody;
+        this.mHasBeenEncrypted = false;
+    }
+
+    private EncryptedDialogueTextMessage(Parcel in) {
+        super(in);
+
+        this.mContext = null; // don't need anymore after encryption
+        this.mMessageBody = null; // don't need anymore after encryption
+        this.mEncryptedBody = in.readParcelable(TextMessageBody.class.getClassLoader());
+        this.mHasBeenEncrypted = in.readByte() != 0;
+    }
+
+    @Override
+    public MessageBody getBody() {
+        /* Encrypt the 1st time only */
+        if (!mHasBeenEncrypted) {
+            encryptBody();
+        }
+
+        return mEncryptedBody;
+    }
+
+    @Override
+    public MessageBody getPlainTextBody() {
+        return super.getPlainTextBody();
+    }
+
+    @Override
+    public MessageBody newBody(String body) {
+        return new TextMessageBody(body);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        /*
+        We can't put the context needed to encrypt the body
+        to the parcel therefore we encrypt the body when we
+        need to parcel it and then pass a null mContext and null
+        mMessageBody because after the first encryption we don't need
+        them anymore.
+         */
+        if (!mHasBeenEncrypted) {
+            encryptBody();
+        }
+
+        super.writeToParcel(dest, flags);
+
+        // Null mContext
+        // Null mMessageBody
+        dest.writeParcelable(mEncryptedBody, flags);
+        dest.writeByte(mHasBeenEncrypted ? (byte) 1 : (byte) 0);
+    }
+
+    public static final Parcelable.Creator<EncryptedDialogueTextMessage> CREATOR =
+            new Parcelable.Creator<EncryptedDialogueTextMessage>() {
+                public EncryptedDialogueTextMessage createFromParcel(Parcel source) {
+                    return new EncryptedDialogueTextMessage(source);
+                }
+
+                public EncryptedDialogueTextMessage[] newArray(int size) {
+                    return new EncryptedDialogueTextMessage[size];
+                }
+            };
+
+    private void encryptBody() {
+        try {
+            mEncryptedBody = new TextMessageBody(Crypto.encrypt(mContext, mMessageBody,
+                    KeyManager.FINGERPRINT));
+        } catch (CryptoException e) {
+            Log.e("ENCRYPTION", "encryption failed", e);
+            DefaultDialogData.getInstance().setMessageStatus(this, MessageStatus.ENCRYPTION_FAILED);
+        }
+
+        mHasBeenEncrypted = true;
+    }
+}

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 
-
 import ch.epfl.sweng.bohdomp.dialogue.R;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.ui.conversationList.ConversationListActivity;
@@ -55,7 +54,7 @@ public class Notificator {
 
         return new Notification.Builder(mContext)
                 .setContentTitle("Message from:" + message.getContact().getDisplayName())
-                .setContentText(message.getBody().getMessageBody())
+                .setContentText(message.getPlainTextBody().getMessageBody())
                 .setAutoCancel(true)
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setSmallIcon(R.drawable.ic_notification)

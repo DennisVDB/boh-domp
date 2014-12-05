@@ -2,6 +2,8 @@ package ch.epfl.sweng.bohdomp.dialogue.exceptions;
 
 import android.test.AndroidTestCase;
 
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
+
 /**
  * tests for FingerprintInsertionExceptions
  */

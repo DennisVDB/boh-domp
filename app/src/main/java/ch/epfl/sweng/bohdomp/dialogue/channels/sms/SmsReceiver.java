@@ -56,14 +56,13 @@ public final class SmsReceiver extends BroadcastReceiver {
         try {
             DialogueMessage dialogueMessage = convertFromSmsMessage(messageBody, phoneNumber);
             DialogueIncomingDispatcher.receiveMessage(context, dialogueMessage);
-
         } catch (InvalidNumberException e) {
             Toast.makeText(context, "Incoming message from strange address: "
                     + phoneNumber, Toast.LENGTH_LONG).show();
         }
     }
 
-    private DialogueTextMessage convertFromSmsMessage(String messageBody, String phoneNumber)
+    private DialogueMessage convertFromSmsMessage(String messageBody, String phoneNumber)
         throws InvalidNumberException {
         Contract.assertNotNull(messageBody, "messageBody");
         Contract.assertNotNull(phoneNumber, "phoneNumber");
