@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.util.encoders.DecoderException;
@@ -149,7 +148,6 @@ public class CryptoService extends IntentService {
     /** Utility method for filling in a bundle with a failure that should never occur. */
     private int hardFailure(Bundle bundle, String action, Exception ex) {
         String message = "Unexpected exception occurred during " + action;
-        Log.e("CryptoService", message, ex);
         return failure(bundle, message);
     }
 

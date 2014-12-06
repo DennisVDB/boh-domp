@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -55,8 +54,6 @@ public class SmsSenderService extends IntentService {
         } else {
             ArrayList<String> messages = mSmsManager.divideMessage(message.getBody().getMessageBody());
 
-            Log.d("BLA", " " + messages.size());
-
             Contact.PhoneNumber number = message.getPhoneNumber();
             sendMultiPartMessage(message, messages, number);
         }
@@ -68,12 +65,14 @@ public class SmsSenderService extends IntentService {
         mSentBroadcastReceiver = new SmsSentBroadcastReceiver(messages.size());
         mDeliveryBroadcastReceiver = new SmsDeliveryBroadcastReceiver(messages.size());
 
-        registerReceiver(mDeliveryBroadcastReceiver, new IntentFilter(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED));
-        registerReceiver(mSentBroadcastReceiver, new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
+        registerReceiver(mDeliveryBroadcastReceiver,
+                new IntentFilter(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED));
+        registerReceiver(mSentBroadcastReceiver,
+                new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
 
         mSmsManager.sendMultipartTextMessage(number.getNumber(), null, messages,
-                null,
-                null);
+                getSentPendingIntentList(message, messages.size()),
+                getDeliveredPendingIntentList(message, messages.size()));
     }
 
     private void sendMonoPartMessage(DialogueMessage message) {
@@ -87,7 +86,7 @@ public class SmsSenderService extends IntentService {
         registerReceiver(mSentBroadcastReceiver, new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
 
         mSmsManager.sendTextMessage(phoneNumber, null, messageBody,
-                null, null);
+                getSentPendingIntent(message), getDeliveryPendingIntent(message));
     }
 
     private boolean needsPartitioning(DialogueMessage message) {

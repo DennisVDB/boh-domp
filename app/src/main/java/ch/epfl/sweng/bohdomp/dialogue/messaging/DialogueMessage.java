@@ -11,7 +11,6 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import ch.epfl.sweng.bohdomp.dialogue.R;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;

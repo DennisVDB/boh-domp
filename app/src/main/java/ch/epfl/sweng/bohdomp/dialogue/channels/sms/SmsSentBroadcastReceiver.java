@@ -7,11 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
-import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
-import ch.epfl.sweng.bohdomp.dialogue.messaging.EncryptedDialogueTextMessage;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -48,7 +46,6 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
         super();
 
         Contract.throwIfArg(nParts <= 0, "Need a least 1 part");
-        Log.d("REC", "parts " + nParts);
 
         this.mNParts = nParts;
     }
@@ -72,20 +69,11 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
                     break;
             }
 
-            Log.d("BLA", "in action");
-
-
             partsReceived += 1;
-            Log.d("REC", "+1");
 
             if (partsReceived == mNParts) {
-                Log.d("BLA", "ended");
-
-
                 if (hasSucceeded) {
                     DialogueMessage message = DialogueMessage.extractMessage(intent);
-
-                    Log.d("ID", message.getId().toString());
 
                     DefaultDialogData.getInstance().setMessageStatus(message, DialogueMessage.MessageStatus.SENT);
 

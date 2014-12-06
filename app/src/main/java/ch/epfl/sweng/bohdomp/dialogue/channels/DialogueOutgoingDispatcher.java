@@ -3,16 +3,10 @@ package ch.epfl.sweng.bohdomp.dialogue.channels;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.ResultReceiver;
-import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.channels.sms.SmsSenderService;
-import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoService;
-import ch.epfl.sweng.bohdomp.dialogue.crypto.KeyManager;
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
-import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -67,9 +61,6 @@ public final class DialogueOutgoingDispatcher extends IntentService {
 
     private void sendSms(final DialogueMessage message, boolean crypt) {
         Contract.assertNotNull(message, "message");
-
-
-        Log.i("DialogueOutgoingDispatcher", "3");
 
         /* Create intent and send to SmsSenderService */
         Intent intent = new Intent(getApplicationContext(), SmsSenderService.class);

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
@@ -66,8 +65,6 @@ public final class SmsDeliveryBroadcastReceiver extends BroadcastReceiver {
 
             if (partsReceived == mNParts) {
                 if (hasSucceeded) {
-
-
                     DialogueMessage message = DialogueMessage.extractMessage(intent);
                     DefaultDialogData.getInstance().setMessageStatus(message, DialogueMessage.MessageStatus.DELIVERED);
                 }

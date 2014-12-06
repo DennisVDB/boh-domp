@@ -2,7 +2,6 @@ package ch.epfl.sweng.bohdomp.dialogue.conversation;
 
 import android.content.Context;
 import android.os.Parcel;
-import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -16,7 +15,6 @@ import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
 import ch.epfl.sweng.bohdomp.dialogue.ids.ConversationId;
 import ch.epfl.sweng.bohdomp.dialogue.ids.IdManager;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
-
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -169,10 +167,7 @@ public final class DialogueConversation implements Conversation {
         Contract.throwIfArgNull(status, "status");
 
         for (DialogueMessage m : mMessages) {
-            Log.d("ID", "here");
-
             if (m.getId().equals(message.getId()) && m.getStatus() != status) {
-                Log.d("ID", "found");
                 m.setStatus(status);
                 notifyListeners();
             }

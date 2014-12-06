@@ -4,15 +4,12 @@ package ch.epfl.sweng.bohdomp.dialogue.channels;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.ResultReceiver;
 
 import org.bouncycastle.openpgp.PGPException;
 
 import java.io.IOException;
 
 import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
-import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoService;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
@@ -66,9 +63,12 @@ public final class DialogueIncomingDispatcher extends IntentService{
             DialogueMessage message = DialogueMessage.extractMessage(intent);
 
             try {
-                TextMessageBody decryptedBody = Crypto.decrypt(getApplicationContext(), message.getBody().getMessageBody());
+                TextMessageBody decryptedBody = Crypto.decrypt(getApplicationContext(),
+                        message.getBody().getMessageBody());
+
                 DialogueMessage decryptedMessage = new DialogueTextMessage(message.getContact(),
-                        message.getChannel(), message.getPhoneNumber(), decryptedBody.getMessageBody(), message.getDirection());
+                        message.getChannel(), message.getPhoneNumber(), decryptedBody.getMessageBody(),
+                        message.getDirection());
 
                 mNotificator = new Notificator(getApplicationContext());
                 mNotificator.update(message);

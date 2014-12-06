@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 
-
 import ch.epfl.sweng.bohdomp.dialogue.R;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.ui.conversationList.ConversationListActivity;

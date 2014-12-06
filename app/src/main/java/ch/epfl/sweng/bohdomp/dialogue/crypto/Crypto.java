@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.bouncycastle.openpgp.PGPException;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
