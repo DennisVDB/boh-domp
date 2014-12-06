@@ -11,6 +11,7 @@ import org.joda.time.Duration;
 import org.joda.time.Interval;
 
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import ch.epfl.sweng.bohdomp.dialogue.R;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
@@ -59,7 +60,7 @@ public abstract class DialogueMessage implements Parcelable {
     public static DialogueMessage extractMessage(Intent intent) {
         Contract.throwIfArgNull(intent, "intent");
 
-        return (DialogueMessage) intent.getExtras().getParcelable(MESSAGE);
+        return intent.getExtras().getParcelable(MESSAGE);
     }
 
     DialogueMessage(Contact contact, Contact.ChannelType channel, Contact.PhoneNumber phoneNumber,
@@ -123,7 +124,7 @@ public abstract class DialogueMessage implements Parcelable {
     }
 
     public MessageBody getPlainTextBody() {
-        return getBody();
+        return mBody;
     }
 
     /**

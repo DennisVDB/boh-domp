@@ -155,12 +155,14 @@ public class ConversationActivity extends Activity implements ConversationListen
                     DialogueMessage message = new EncryptedDialogueTextMessage(getApplicationContext(),
                             contact, channel, number, draftText, DialogueMessage.MessageDirection.OUTGOING);
 
+//                    DialogueMessage message = new DialogueTextMessage(contact, channel, number,
+//                            draftText, DialogueMessage.MessageDirection.OUTGOING);
+
                     Contract.assertNotNull(message, "message");
-//                    Contract.assertNotNull(message.getBody(), "body");
-//                    Contract.assertNotNull(message.getPlainTextBody(), "plaintext");
+                    Contract.assertNotNull(message.getBody(), "body");
+                    Contract.assertNotNull(message.getPlainTextBody(), "plaintext");
 
                     Log.d("BLA", message.getBody().toString());
-
                     Log.d("ID", message.getId().toString());
 
                     DialogueOutgoingDispatcher.sendMessage(view.getContext(), message,

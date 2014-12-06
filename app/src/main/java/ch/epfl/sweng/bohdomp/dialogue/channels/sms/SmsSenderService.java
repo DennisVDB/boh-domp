@@ -5,8 +5,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -20,9 +22,6 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
  */
 public class SmsSenderService extends IntentService {
     public static final String ACTION_SEND_SMS = "SEND_SMS";
-
-    private static final String ACTION_SMS_SENT = "SMS_SENT";
-    private static final String ACTION_SMS_DELIVERED = "SMS_DELIVERED";
 
     private BroadcastReceiver mSentBroadcastReceiver = new SmsSentBroadcastReceiver();
     private BroadcastReceiver mDeliveryBroadcastReceiver = new SmsDeliveryBroadcastReceiver();
@@ -56,8 +55,7 @@ public class SmsSenderService extends IntentService {
         } else {
             ArrayList<String> messages = mSmsManager.divideMessage(message.getBody().getMessageBody());
 
-            mSentBroadcastReceiver = new SmsSentBroadcastReceiver(messages.size());
-            mDeliveryBroadcastReceiver = new SmsDeliveryBroadcastReceiver(messages.size());
+            Log.d("BLA", " " + messages.size());
 
             Contact.PhoneNumber number = message.getPhoneNumber();
             sendMultiPartMessage(message, messages, number);
@@ -67,7 +65,12 @@ public class SmsSenderService extends IntentService {
     private void sendMultiPartMessage(DialogueMessage message, ArrayList<String> messages, Contact.PhoneNumber number) {
         Contract.assertNotNull(number, "number");
 
-        //FIXME MUST IMPLEMENT THE PENDING INTENTS
+        mSentBroadcastReceiver = new SmsSentBroadcastReceiver(messages.size());
+        mDeliveryBroadcastReceiver = new SmsDeliveryBroadcastReceiver(messages.size());
+
+        registerReceiver(mDeliveryBroadcastReceiver, new IntentFilter(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED));
+        registerReceiver(mSentBroadcastReceiver, new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
+
         mSmsManager.sendMultipartTextMessage(number.getNumber(), null, messages,
                 null,
                 null);
@@ -80,7 +83,9 @@ public class SmsSenderService extends IntentService {
         mSentBroadcastReceiver = new SmsDeliveryBroadcastReceiver();
         mDeliveryBroadcastReceiver = new SmsDeliveryBroadcastReceiver();
 
-        //FIXME MUST IMPLEMENT THE PENDING INTENTS
+        registerReceiver(mDeliveryBroadcastReceiver, new IntentFilter(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED));
+        registerReceiver(mSentBroadcastReceiver, new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
+
         mSmsManager.sendTextMessage(phoneNumber, null, messageBody,
                 null, null);
     }
@@ -115,10 +120,8 @@ public class SmsSenderService extends IntentService {
     private PendingIntent getSentPendingIntent() {
         Contract.assertNotNull(mSentBroadcastReceiver, "mSentBroadcastReceiver");
 
-        PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_SMS_SENT),
+        PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(SmsSentBroadcastReceiver.ACTION_SMS_SENT),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-
-        registerReceiver(mSentBroadcastReceiver, new IntentFilter(ACTION_SMS_SENT));
 
         return sentPendingIntent;
     }
@@ -126,14 +129,16 @@ public class SmsSenderService extends IntentService {
     private PendingIntent getSentPendingIntent(DialogueMessage message) {
         Contract.throwIfArgNull(message, "message");
 
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(DialogueMessage.MESSAGE, message);
+
         Intent intent = new Intent(getApplicationContext(), SmsSentBroadcastReceiver.class);
-        intent.setAction(SmsSenderService.ACTION_SMS_SENT);
-        intent.putExtra(DialogueMessage.MESSAGE, message);
+        intent.setAction(SmsSentBroadcastReceiver.ACTION_SMS_SENT);
+        intent.putExtras(bundle);
+
 
         PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-
-        registerReceiver(mSentBroadcastReceiver, new IntentFilter(ACTION_SMS_SENT));
 
         return sentPendingIntent;
     }
@@ -146,10 +151,8 @@ public class SmsSenderService extends IntentService {
     private PendingIntent getDeliveryPendingIntent() {
         Contract.assertNotNull(mDeliveryBroadcastReceiver, "mDeliveryBroadcastReceiver");
 
-        PendingIntent deliveryPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_SMS_DELIVERED),
+        PendingIntent deliveryPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-
-        registerReceiver(mDeliveryBroadcastReceiver, new IntentFilter(ACTION_SMS_DELIVERED));
 
         return deliveryPendingIntent;
     }
@@ -158,13 +161,11 @@ public class SmsSenderService extends IntentService {
         Contract.throwIfArgNull(message, "message");
 
         Intent intent = new Intent(getApplicationContext(), SmsDeliveryBroadcastReceiver.class);
-        intent.setAction(SmsSenderService.ACTION_SMS_DELIVERED);
+        intent.setAction(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED);
         intent.putExtra(DialogueMessage.MESSAGE, message);
 
         PendingIntent deliveryPendingIntent = PendingIntent.getBroadcast(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-
-        registerReceiver(mDeliveryBroadcastReceiver, new IntentFilter(ACTION_SMS_DELIVERED));
 
         return deliveryPendingIntent;
     }

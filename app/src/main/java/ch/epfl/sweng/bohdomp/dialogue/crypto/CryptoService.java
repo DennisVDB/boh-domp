@@ -120,7 +120,7 @@ public class CryptoService extends IntentService {
 
     }
 
-    private void handleActionEncrypt(String fingerprint, String message, ResultReceiver receiver) {
+    public void handleActionEncrypt(String fingerprint, String message, ResultReceiver receiver) {
         Contract.throwIfArgNull(fingerprint, "fingerprint");
         Contract.throwIfArgNull(message, "message");
         Contract.throwIfArgNull(receiver, "receiver");

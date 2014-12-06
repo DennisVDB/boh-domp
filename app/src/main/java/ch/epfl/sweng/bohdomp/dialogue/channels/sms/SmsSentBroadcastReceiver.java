@@ -11,6 +11,7 @@ import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.EncryptedDialogueTextMessage;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -20,7 +21,7 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "SmsSentBroadcastReceiver";
 
-    private static final String ACTION_SMS_SENT = "SMS_SENT";
+    public static final String ACTION_SMS_SENT = "SMS_SENT";
 
     private int mNParts;
     private int partsReceived = 0;
@@ -82,9 +83,6 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
 
 
                 if (hasSucceeded) {
-
-                    Log.d("BLA", "succeeded");
-
                     DialogueMessage message = DialogueMessage.extractMessage(intent);
 
                     Log.d("ID", message.getId().toString());

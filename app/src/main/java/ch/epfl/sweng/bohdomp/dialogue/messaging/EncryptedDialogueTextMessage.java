@@ -1,14 +1,11 @@
 package ch.epfl.sweng.bohdomp.dialogue.messaging;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.ResultReceiver;
-import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
-import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoService;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.KeyManager;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
@@ -25,23 +22,12 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
 
         Contract.throwIfArgNull(context, "context");
 
-//        CryptoService.startActionEncrypt(context, KeyManager.FINGERPRINT, messageBody,
-//                new ResultReceiver(null) {
-//                    @Override
-//                    protected void onReceiveResult(final int resultCode, final Bundle resultData) {
-//                        if (resultCode == CryptoService.RESULT_SUCCESS) {
-//                            mEncryptedBody = new TextMessageBody(resultData.getString(CryptoService.EXTRA_ENCRYPTED_TEXT));
-//                        }
-//                    }
-//                });
-
-        this.mEncryptedBody = new TextMessageBody("Fuck");
+        this.mEncryptedBody = Crypto.encrypt(context, messageBody, KeyManager.FINGERPRINT);
     }
 
     @Override
     public MessageBody getBody() {
-        Contract.assertNotNull(mEncryptedBody, "body2");
-        return mEncryptedBody;
+       return mEncryptedBody;
     }
 
     @Override
@@ -57,13 +43,11 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-
         dest.writeParcelable(mEncryptedBody, flags);
     }
 
-    EncryptedDialogueTextMessage(Parcel in) {
+    private EncryptedDialogueTextMessage(Parcel in) {
         super(in);
-
         this.mEncryptedBody = in.readParcelable(TextMessageBody.class.getClassLoader());
     }
 
