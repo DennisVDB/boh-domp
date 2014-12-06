@@ -136,7 +136,6 @@ public class SmsSenderService extends IntentService {
         intent.setAction(SmsSentBroadcastReceiver.ACTION_SMS_SENT);
         intent.putExtras(bundle);
 
-
         PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -176,15 +175,15 @@ public class SmsSenderService extends IntentService {
 
         ArrayList<PendingIntent> list = new ArrayList<PendingIntent>();
 
+        list.add(getSentPendingIntent(message));
         /*
         In order to know which message has been delivered we pass it
         with the last pending intent so that the receiver can set the flag.
          */
         for (int i = 0; i < copies - 1; i++) {
-            list.add(getSentPendingIntent());
+            list.add(getSentPendingIntent(message));
         }
 
-        list.add(getSentPendingIntent(message));
 
         return list;
     }
@@ -195,15 +194,15 @@ public class SmsSenderService extends IntentService {
 
         ArrayList<PendingIntent> list = new ArrayList<PendingIntent>();
 
+        list.add(getDeliveryPendingIntent(message));
         /*
         In order to know which message has been delivered we pass it
         with the last pending intent so that the receiver can set the flag.
          */
         for (int i = 0; i < copies - 1; i++) {
-            list.add(getDeliveryPendingIntent());
+            list.add(getDeliveryPendingIntent(message));
         }
 
-        list.add(getDeliveryPendingIntent(message));
 
         return list;
     }

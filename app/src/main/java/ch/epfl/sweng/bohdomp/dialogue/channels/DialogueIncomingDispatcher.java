@@ -7,10 +7,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
+import org.bouncycastle.openpgp.PGPException;
+
+import java.io.IOException;
+
+import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoService;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.TextMessageBody;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -58,10 +65,22 @@ public final class DialogueIncomingDispatcher extends IntentService{
 
             DialogueMessage message = DialogueMessage.extractMessage(intent);
 
-            mNotificator = new Notificator(getApplicationContext());
-            mNotificator.update(message);
+            try {
+                TextMessageBody decryptedBody = Crypto.decrypt(getApplicationContext(), message.getBody().getMessageBody());
+                DialogueMessage decryptedMessage = new DialogueTextMessage(message.getContact(),
+                        message.getChannel(), message.getPhoneNumber(), decryptedBody.getMessageBody(), message.getDirection());
 
-            DefaultDialogData.getInstance().addMessageToConversation(message);
+                mNotificator = new Notificator(getApplicationContext());
+                mNotificator.update(message);
+
+                DefaultDialogData.getInstance().addMessageToConversation(decryptedMessage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (PGPException e) {
+                e.printStackTrace();
+            } catch (IncorrectPassphraseException e) {
+                e.printStackTrace();
+            }
 
             sIsRunning = true;
         }

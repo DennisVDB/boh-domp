@@ -4,12 +4,15 @@ import android.content.Context;
 
 import org.bouncycastle.openpgp.PGPException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKey;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyRing;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyRing;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.TextMessageBody;
 
 /**
@@ -45,5 +48,22 @@ public class Crypto {
         }
 
         return new TextMessageBody(encryptedMessage);
+    }
+
+    public static TextMessageBody decrypt(Context context, String message) throws IOException, PGPException, IncorrectPassphraseException {
+        KeyManager keyManager = new KeyManager(context);
+
+        String fingerprint = KeyManager.FINGERPRINT; //TODO retrieve fingerprint associated to private key
+        String passphrase = KeyManager.PASSPHRASE; //TODO retrieve passphrase from account management
+
+        SecretKeyRing keyRing = keyManager.getSecretKeyChain().getKeyRing(fingerprint);
+
+        if (keyRing == null) {
+            throw new NoSuchElementException("No public key matching the fingerprint \"" + fingerprint + "\" can be found.");
+        }
+
+        String decryptedMessage = keyRing.decrypt(message, passphrase);
+
+        return new TextMessageBody(decryptedMessage);
     }
 }

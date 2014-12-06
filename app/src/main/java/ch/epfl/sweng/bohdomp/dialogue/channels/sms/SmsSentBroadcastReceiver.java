@@ -48,6 +48,7 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
         super();
 
         Contract.throwIfArg(nParts <= 0, "Need a least 1 part");
+        Log.d("REC", "parts " + nParts);
 
         this.mNParts = nParts;
     }
@@ -56,8 +57,6 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Contract.throwIfArgNull(context, "context");
         Contract.throwIfArgNull(intent, "intent");
-
-        Log.d("BLA", "sent called");
 
         if (intent.getAction().equals(ACTION_SMS_SENT)) {
             switch (getResultCode()) {
@@ -77,6 +76,7 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
 
 
             partsReceived += 1;
+            Log.d("REC", "+1");
 
             if (partsReceived == mNParts) {
                 Log.d("BLA", "ended");

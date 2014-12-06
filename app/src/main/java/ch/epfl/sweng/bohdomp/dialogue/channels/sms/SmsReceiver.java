@@ -10,7 +10,6 @@ import ch.epfl.sweng.bohdomp.dialogue.channels.DialogueIncomingDispatcher;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.ContactFactory;
 import ch.epfl.sweng.bohdomp.dialogue.exceptions.InvalidNumberException;
-import ch.epfl.sweng.bohdomp.dialogue.messaging.DecryptedDialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
@@ -50,22 +49,21 @@ public final class SmsReceiver extends BroadcastReceiver {
         Contract.throwIfArgNull(phoneNumber, "phoneNumber");
 
         try {
-            DialogueMessage dialogueMessage = convertFromSmsMessage(context, messageBody, phoneNumber);
+            DialogueMessage dialogueMessage = convertFromSmsMessage(messageBody, phoneNumber);
             DialogueIncomingDispatcher.receiveMessage(context, dialogueMessage);
-
         } catch (InvalidNumberException e) {
             Toast.makeText(context, "Incoming message from strange address: "
                     + phoneNumber, Toast.LENGTH_LONG).show();
         }
     }
 
-    private DecryptedDialogueMessage convertFromSmsMessage(Context context, String messageBody, String phoneNumber)
+    private DialogueMessage convertFromSmsMessage(String messageBody, String phoneNumber)
         throws InvalidNumberException {
         Contract.throwIfArgNull(messageBody, "messageBody");
         Contract.throwIfArgNull(phoneNumber, "phoneNumber");
 
         Contact contact = mContactFactory.contactFromNumber(phoneNumber);
 
-        return new DecryptedDialogueMessage(context, contact, null, null, messageBody, DialogueMessage.MessageDirection.INCOMING, false);
+        return new DialogueTextMessage(contact, null, null, messageBody, DialogueMessage.MessageDirection.INCOMING);
     }
 }
