@@ -10,7 +10,8 @@ import ch.epfl.sweng.bohdomp.dialogue.crypto.KeyManager;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
- * Created by dennis on 05/12/14.
+ * Encrypted version of a DialogueTextMessage.
+ * The message is encrypted only when it is first needed.
  */
 public class EncryptedDialogueTextMessage extends DialogueMessage {
     private Context mContext;
