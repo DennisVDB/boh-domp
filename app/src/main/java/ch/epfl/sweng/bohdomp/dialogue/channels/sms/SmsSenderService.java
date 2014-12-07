@@ -59,7 +59,9 @@ public class SmsSenderService extends IntentService {
         }
     }
 
-    private void sendMultiPartMessage(DialogueMessage message, ArrayList<String> messages, Contact.PhoneNumber number) {
+    private void sendMultiPartMessage(DialogueMessage message, ArrayList<String> messages,
+        Contact.PhoneNumber number) {
+
         Contract.assertNotNull(number, "number");
 
         mSentBroadcastReceiver = new SmsSentBroadcastReceiver(messages.size());
@@ -82,8 +84,10 @@ public class SmsSenderService extends IntentService {
         mSentBroadcastReceiver = new SmsDeliveryBroadcastReceiver();
         mDeliveryBroadcastReceiver = new SmsDeliveryBroadcastReceiver();
 
-        registerReceiver(mDeliveryBroadcastReceiver, new IntentFilter(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED));
-        registerReceiver(mSentBroadcastReceiver, new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
+        registerReceiver(mDeliveryBroadcastReceiver,
+                new IntentFilter(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED));
+        registerReceiver(mSentBroadcastReceiver,
+                new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
 
         mSmsManager.sendTextMessage(phoneNumber, null, messageBody,
                 getSentPendingIntent(message), getDeliveryPendingIntent(message));
@@ -119,7 +123,8 @@ public class SmsSenderService extends IntentService {
     private PendingIntent getSentPendingIntent() {
         Contract.assertNotNull(mSentBroadcastReceiver, "mSentBroadcastReceiver");
 
-        PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(SmsSentBroadcastReceiver.ACTION_SMS_SENT),
+        PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0,
+                new Intent(SmsSentBroadcastReceiver.ACTION_SMS_SENT),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         return sentPendingIntent;
@@ -149,7 +154,8 @@ public class SmsSenderService extends IntentService {
     private PendingIntent getDeliveryPendingIntent() {
         Contract.assertNotNull(mDeliveryBroadcastReceiver, "mDeliveryBroadcastReceiver");
 
-        PendingIntent deliveryPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED),
+        PendingIntent deliveryPendingIntent = PendingIntent.getBroadcast(this, 0,
+                new Intent(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         return deliveryPendingIntent;
