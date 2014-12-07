@@ -145,9 +145,6 @@ public class MessagesAdapter extends BaseAdapter {
         Contract.assertNotNull(msg, "message");
         Contract.assertNotNull(viewHolder, "viewHolder");
 
-        Contract.assertNotNull(msg.getPlainTextBody(), "plaintext");
-        Contract.assertNotNull(msg.getPlainTextBody().getMessageBody(), "body");
-
         String body = msg.getPlainTextBody().getMessageBody();
         viewHolder.body.setText(body);
         viewHolder.timeStamp.setText(msg.prettyTimeStamp(mContext));

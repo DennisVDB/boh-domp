@@ -13,7 +13,10 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
  * Created by dennis on 05/12/14.
  */
 public class EncryptedDialogueTextMessage extends DialogueMessage {
+    private Context mContext;
+    private String mMessageBody;
     private TextMessageBody mEncryptedBody;
+    private boolean mHasBeenEncrypted;
 
     public EncryptedDialogueTextMessage(final Context context, Contact contact, Contact.ChannelType channel, Contact.PhoneNumber phoneNumber,
                                         String messageBody, MessageDirection messageDirection) {
@@ -22,12 +25,23 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
 
         Contract.throwIfArgNull(context, "context");
 
-        this.mEncryptedBody = Crypto.encrypt(context, messageBody, KeyManager.FINGERPRINT);
+        this.mContext = context;
+        this.mMessageBody = messageBody;
+        this.mHasBeenEncrypted = false;
     }
 
     @Override
     public MessageBody getBody() {
-       return mEncryptedBody;
+        if (!mHasBeenEncrypted) {
+            encryptBody();
+        }
+
+        return mEncryptedBody;
+    }
+
+    private void encryptBody() {
+        mEncryptedBody = Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT);
+        mHasBeenEncrypted = true;
     }
 
     @Override
@@ -42,13 +56,32 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        /*
+        We can't put the context needed to encrypt the body
+        to the parcel therefore we encrypt the body when we
+        need to parcel it and then pass a null mContext and null
+        mMessageBody because after the first encryption we don't need
+        them anymore.
+         */
+        if (!mHasBeenEncrypted) {
+            encryptBody();
+        }
+
         super.writeToParcel(dest, flags);
+
+        // Null mContext
+        // Null mMessageBody
         dest.writeParcelable(mEncryptedBody, flags);
+        dest.writeByte(mHasBeenEncrypted ? (byte) 1 : (byte) 0);
     }
 
     private EncryptedDialogueTextMessage(Parcel in) {
         super(in);
+
+        this.mContext = null; // don't need anymore after encryption
+        this.mMessageBody = null; // don't need anymore after encryption
         this.mEncryptedBody = in.readParcelable(TextMessageBody.class.getClassLoader());
+        this.mHasBeenEncrypted = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<EncryptedDialogueTextMessage> CREATOR =

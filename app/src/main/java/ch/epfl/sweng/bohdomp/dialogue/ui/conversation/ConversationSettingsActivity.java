@@ -99,7 +99,7 @@ public class ConversationSettingsActivity extends Activity {
         }
 
         mEncryptBox.setVisibility(View.VISIBLE);
-        mEncryptBox.setChecked(mConversation.getEncrypt());
+        mEncryptBox.setChecked(mConversation.needEncryption());
 
         if (contact.hasFingerprint()) {
             mEncryptBox.setText("Encrypt this conversation");
@@ -132,7 +132,7 @@ public class ConversationSettingsActivity extends Activity {
         mEncryptBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b != mConversation.getEncrypt()) {
+                if (b != mConversation.needEncryption()) {
                     mConversation.setEncrypt(b);
                 }
 

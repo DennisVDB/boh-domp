@@ -51,7 +51,7 @@ public interface Conversation extends Parcelable {
      * Getter for the encrypt boolean
      * @return true if conversation is encrypted
      */
-    Boolean getEncrypt();
+    Boolean needEncryption();
 
     /**
      * Getter for the messages list of the conversation

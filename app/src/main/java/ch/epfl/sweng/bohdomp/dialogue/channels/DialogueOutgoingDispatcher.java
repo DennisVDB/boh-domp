@@ -22,11 +22,10 @@ public final class DialogueOutgoingDispatcher extends IntentService {
 
     /**
      * Handles the sending of messages.
-     *
-     * @param context of the application.
+     *  @param context of the application.
      * @param message to be sent.
      */
-    public static void sendMessage(Context context, DialogueMessage message, boolean encrypt) {
+    public static void sendMessage(Context context, DialogueMessage message) {
         Contract.throwIfArgNull(context, "context");
         Contract.throwIfArgNull(message, "message");
         Contract.throwIfArg(message.getDirection() == DialogueMessage.MessageDirection.INCOMING,
@@ -35,7 +34,6 @@ public final class DialogueOutgoingDispatcher extends IntentService {
         /* Create intent and send to myself */
         Intent intent = new Intent(context, DialogueOutgoingDispatcher.class);
         intent.setAction(ACTION_SEND_MESSAGE);
-        intent.putExtra(MUST_BE_ENCRYPTED, encrypt);
         intent.putExtra(DialogueMessage.MESSAGE, message);
         context.startService(intent);
     }
@@ -48,10 +46,9 @@ public final class DialogueOutgoingDispatcher extends IntentService {
             DialogueMessage message = DialogueMessage.extractMessage(intent);
 
             DefaultDialogData.getInstance().addMessageToConversation(message);
-            Boolean encrypt = intent.getBooleanExtra(MUST_BE_ENCRYPTED, false);
             switch (message.getChannel()) {
                 case SMS:
-                    sendSms(message, encrypt);
+                    sendSms(message);
                     break;
                 default:
                     throw new IllegalStateException("not valid channel");
@@ -59,7 +56,7 @@ public final class DialogueOutgoingDispatcher extends IntentService {
         }
     }
 
-    private void sendSms(final DialogueMessage message, boolean crypt) {
+    private void sendSms(final DialogueMessage message) {
         Contract.assertNotNull(message, "message");
 
         /* Create intent and send to SmsSenderService */

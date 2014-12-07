@@ -108,7 +108,7 @@ public final class DialogueConversation implements Conversation {
     }
 
     @Override
-    public Boolean getEncrypt() {
+    public Boolean needEncryption() {
         return mEncrypt;
     }
 
