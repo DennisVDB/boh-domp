@@ -2,13 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ch.epfl.sweng.bohdomp.dialogue" >
 
+    <!-- Used to able to receive sms messages during phone calls -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- Used since this app replaces the default sms app -->
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- Used to write key fingerprints to contacts -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <!-- Used for communicating with key servers -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
