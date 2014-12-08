@@ -108,12 +108,6 @@
             android:exported="false" >
         </service>
 
-        <!-- Service that handles cryptographic functionality -->
-        <service
-            android:name=".crypto.CryptoService"
-            android:exported="false" >
-        </service>
-
         <!-- BroadcastReceiver that listens for the delivery of SMS messages -->
         <receiver
             android:name=".channels.sms.SmsDeliveryBroadcastReceiver"

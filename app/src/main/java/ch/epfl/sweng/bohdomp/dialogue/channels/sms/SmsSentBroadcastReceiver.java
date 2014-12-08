@@ -87,7 +87,7 @@ public final class SmsSentBroadcastReceiver extends BroadcastReceiver {
         ContentValues values = new ContentValues();
 
         values.put("address", message.getPhoneNumber().getNumber());
-        values.put("body", message.getBody().getMessageBody());
+        values.put("body", message.getPlainTextBody().getMessageBody());
 
         context.getContentResolver().insert(Telephony.Sms.Sent.CONTENT_URI, values);
     }

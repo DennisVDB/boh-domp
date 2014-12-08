@@ -7,13 +7,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.bouncycastle.openpgp.PGPException;
-
-import java.io.IOException;
-
 import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoException;
-import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
 import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;

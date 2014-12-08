@@ -19,10 +19,8 @@ public class EncryptedDialogueTextMessageTest extends AndroidTestCase {
     public void testParcelRoundTrip() throws InvalidNumberException {
         Contact contact = new ContactFactory(getContext()).contactFromNumber("1234");
 
-        List<Contact> contactList = new ArrayList<>();
-        contactList.add(contact);
-
         PhoneNumber phoneNumber = (PhoneNumber) contact.getPhoneNumbers(Contact.ChannelType.SMS).toArray()[0];
+
         EncryptedDialogueTextMessage message = new EncryptedDialogueTextMessage(getContext(),
                 contact, Contact.ChannelType.SMS, phoneNumber, "test",
                 DialogueMessage.MessageDirection.OUTGOING);

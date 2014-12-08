@@ -73,8 +73,8 @@ public class SmsSenderService extends IntentService {
                 new IntentFilter(SmsSentBroadcastReceiver.ACTION_SMS_SENT));
 
         mSmsManager.sendMultipartTextMessage(number.getNumber(), null, messages,
-                getSentPendingIntentList(message, messages.size()),
-                getDeliveredPendingIntentList(message, messages.size()));
+                getSentPendingIntentList(message),
+                getDeliveredPendingIntentList(message));
     }
 
     private void sendMonoPartMessage(DialogueMessage message) {
@@ -115,50 +115,20 @@ public class SmsSenderService extends IntentService {
         super.onDestroy();
     }
 
-    /**
-     * Creates a "sent" pending intent that will be handled by the "sent" broadcast receiver.
-     *
-     * @return "sent" pending intent.
-     */
-    private PendingIntent getSentPendingIntent() {
-        Contract.assertNotNull(mSentBroadcastReceiver, "mSentBroadcastReceiver");
-
-        PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0,
-                new Intent(SmsSentBroadcastReceiver.ACTION_SMS_SENT),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        return sentPendingIntent;
-    }
 
     private PendingIntent getSentPendingIntent(DialogueMessage message) {
         Contract.throwIfArgNull(message, "message");
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable(DialogueMessage.MESSAGE, message);
 
         Intent intent = new Intent(getApplicationContext(), SmsSentBroadcastReceiver.class);
         intent.setAction(SmsSentBroadcastReceiver.ACTION_SMS_SENT);
-        intent.putExtras(bundle);
+        intent.putExtra(DialogueMessage.MESSAGE, message);
 
         PendingIntent sentPendingIntent = PendingIntent.getBroadcast(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         return sentPendingIntent;
-    }
-
-    /**
-     * Creates a "delivery" pending intent that will be handles by the "delivery" broadcast receiver.
-     *
-     * @return "delivery" pending intent.
-     */
-    private PendingIntent getDeliveryPendingIntent() {
-        Contract.assertNotNull(mDeliveryBroadcastReceiver, "mDeliveryBroadcastReceiver");
-
-        PendingIntent deliveryPendingIntent = PendingIntent.getBroadcast(this, 0,
-                new Intent(SmsDeliveryBroadcastReceiver.ACTION_SMS_DELIVERED),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        return deliveryPendingIntent;
     }
 
     private PendingIntent getDeliveryPendingIntent(DialogueMessage message) {
@@ -174,40 +144,26 @@ public class SmsSenderService extends IntentService {
         return deliveryPendingIntent;
     }
 
-    private ArrayList<PendingIntent> getSentPendingIntentList(DialogueMessage message, int copies) {
-        Contract.throwIfArgNull(message, "message");
-        Contract.throwIfArg(copies <= 0, "Copies should be at least 1");
-
-        ArrayList<PendingIntent> list = new ArrayList<PendingIntent>();
+    /*
+    Needs only one because the API is weird.
+     */
+    private ArrayList<PendingIntent> getSentPendingIntentList(DialogueMessage message) {
+        ArrayList<PendingIntent> list = new ArrayList<>();
 
         list.add(getSentPendingIntent(message));
-        /*
-        In order to know which message has been delivered we pass it
-        with the last pending intent so that the receiver can set the flag.
-         */
-        for (int i = 0; i < copies - 1; i++) {
-            list.add(getSentPendingIntent(message));
-        }
-
 
         return list;
     }
 
-    private ArrayList<PendingIntent> getDeliveredPendingIntentList(DialogueMessage message, int copies) {
+    /*
+    Needs only one because the API is weird.
+     */
+    private ArrayList<PendingIntent> getDeliveredPendingIntentList(DialogueMessage message) {
         Contract.throwIfArgNull(message, "message");
-        Contract.throwIfArg(copies <= 0, "Copies should be at least 1");
 
-        ArrayList<PendingIntent> list = new ArrayList<PendingIntent>();
+        ArrayList<PendingIntent> list = new ArrayList<>();
 
         list.add(getDeliveryPendingIntent(message));
-        /*
-        In order to know which message has been delivered we pass it
-        with the last pending intent so that the receiver can set the flag.
-         */
-        for (int i = 0; i < copies - 1; i++) {
-            list.add(getDeliveryPendingIntent(message));
-        }
-
 
         return list;
     }

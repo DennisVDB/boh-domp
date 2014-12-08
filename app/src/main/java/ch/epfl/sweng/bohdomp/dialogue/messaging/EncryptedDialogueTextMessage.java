@@ -22,6 +22,7 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
     private String mMessageBody;
     private TextMessageBody mEncryptedBody;
     private boolean mHasBeenEncrypted;
+
     public EncryptedDialogueTextMessage(Context context, Contact contact, Contact.ChannelType channel,
                                         Contact.PhoneNumber phoneNumber, String messageBody,
                                         MessageDirection messageDirection) {
@@ -99,7 +100,8 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
 
     private void encryptBody() {
         try {
-            mEncryptedBody = new TextMessageBody(Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT));
+            mEncryptedBody = new TextMessageBody(Crypto.encrypt(mContext, mMessageBody,
+                    KeyManager.FINGERPRINT));
         } catch (CryptoException e) {
             Log.e("ENCRYPTION", "encryption failed", e);
             DefaultDialogData.getInstance().setMessageStatus(this, MessageStatus.ENCRYPTION_FAILED);
