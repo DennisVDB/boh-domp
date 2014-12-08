@@ -29,9 +29,9 @@ public class Client {
 
     private final String mLookupUrl;
 
-    public Client(String keyServerUrl) {
-        Contract.throwIfArgNull(keyServerUrl, "keyServerUrl");
-        this.mLookupUrl = keyServerUrl + "/pks/lookup";
+    public Client(String keyServer) {
+        Contract.throwIfArgNull(keyServer, "keyServer");
+        this.mLookupUrl = "http://" + keyServer + "/pks/lookup";
     }
 
     /**
@@ -55,7 +55,7 @@ public class Client {
      */
     private String lookup(Map<String, String> vars) throws IOException, HkpServerException {
         HttpClient client = new DefaultHttpClient();
-        HttpGet request = new HttpGet("http://" + mLookupUrl + "?" + makeQuery(vars));
+        HttpGet request = new HttpGet(mLookupUrl + "?" + makeQuery(vars));
         HttpResponse response = client.execute(request);
 
         String responseCode = Integer.toString(response.getStatusLine().getStatusCode());
