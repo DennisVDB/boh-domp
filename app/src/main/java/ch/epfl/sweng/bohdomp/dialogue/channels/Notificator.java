@@ -31,7 +31,7 @@ public class Notificator {
 
         Notification.Builder mBuilder = new Notification.Builder(mContext)
                 .setContentTitle("Message from:" + message.getContact().getDisplayName())
-                .setContentText(message.getBody().getMessageBody())
+                .setContentText(message.getPlainTextBody().getMessageBody())
                 .setAutoCancel(true)
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setSmallIcon(R.drawable.ic_notification);

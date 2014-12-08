@@ -153,7 +153,7 @@ public class ConversationActivity extends Activity implements ConversationListen
                 for (Contact contact : mConversation.getContacts()) {
                     DialogueMessage message;
 
-                    if (mConversation.needEncryption()) {
+                    if (!mConversation.needEncryption()) {
                         message = new EncryptedDialogueTextMessage(getApplicationContext(),
                                 contact, channel, number, draftText, DialogueMessage.MessageDirection.OUTGOING);
                     } else {
