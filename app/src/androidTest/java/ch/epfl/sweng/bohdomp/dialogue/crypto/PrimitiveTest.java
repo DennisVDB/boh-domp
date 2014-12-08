@@ -1,15 +1,19 @@
 package ch.epfl.sweng.bohdomp.dialogue.crypto;
 
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import junit.framework.Assert;
 
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPUtil;
 
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKey;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyChain;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyChainBuilder;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKeyRing;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyChain;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyChainBuilder;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyRing;
 import ch.epfl.sweng.bohdomp.dialogue.exceptions.NullArgumentException;
@@ -139,4 +143,29 @@ public class PrimitiveTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Extract the encoded key data from an ascii-armored keychain. This method effectively
+     * strips the headers and version field, thus enabling comparison of keys produced by different
+     * implementations of OpenPGP
+     */
+    private String extractKeyData(String chain) {
+        String noHeader = chain.replaceAll("-----BEGIN PGP PUBLIC KEY BLOCK-----\\n", "");
+        String noVersion = noHeader.replaceAll("Version: .*\\n", "");
+        String noFooter = noVersion.replaceAll("=.*\\n-----END PGP PUBLIC KEY BLOCK-----\n", "");
+        return noFooter;
+    }
+
+    public void testPublicChainAddition() throws Exception {
+        PublicKeyChain empty = new PublicKeyChainBuilder().empty();
+        Assert.assertEquals(extractKeyData(TestKeyData.PUBLIC_KEY_RING),
+                extractKeyData(empty.add(publicKeyRing).toArmored()));
+
+    }
+
+    public void testSecretChainAddition() throws Exception {
+        SecretKeyChain empty = new SecretKeyChainBuilder().empty();
+        Assert.assertEquals(extractKeyData(TestKeyData.SECRET_KEY_RING),
+                extractKeyData(empty.add(secretKeyRing).toArmored()));
+
+    }
 }

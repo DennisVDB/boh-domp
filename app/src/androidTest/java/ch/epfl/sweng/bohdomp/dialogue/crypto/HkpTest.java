@@ -38,5 +38,5 @@ public class HkpTest extends AndroidTestCase {
     public void testLookupKey() throws Exception {
         mClient.lookupKeyChain(TestKeyData.FINGERPRINT);
     }
-    
+
 }
