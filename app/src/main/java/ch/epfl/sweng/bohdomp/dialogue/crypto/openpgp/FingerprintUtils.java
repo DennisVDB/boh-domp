@@ -39,6 +39,18 @@ public class FingerprintUtils {
     }
 
     /**
+     * Format a fingerprint to a key server query format. Such a format
+     * consists of the pretty fingerprint without spaces, preceded by "0x".
+     */
+    public static String toQuery(String fingerprint) {
+        Contract.throwIfArgNull(fingerprint, "fingerprint");
+
+        String pretty = fromString(fingerprint);
+        String noSpace = pretty.replaceAll("\\s+", "");
+        return "0x" + noSpace;
+    }
+
+    /**
      * Checks whether a given fingerprint is in a valid format.
      * This is equivalent to creating a pretty fingerprint and checking
      * that it is composed of 10 groups of 4 hex digits.

@@ -10,6 +10,7 @@ import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.bc.BcPGPObjectFactory;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
+import org.bouncycastle.util.encoders.DecoderException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,8 +72,17 @@ public abstract class SecretKeyLike {
 
     /** Decode an input stream into a collection of encypted data packets. */
     private static PGPEncryptedDataList decode(InputStream encrypted) throws IOException, PGPException {
-        InputStream decoded = PGPUtil.getDecoderStream(encrypted);
-        return extractPgpData(decoded);
+        InputStream decoded = null;
+        try {
+            decoded = PGPUtil.getDecoderStream(encrypted);
+            return extractPgpData(decoded);
+        } catch (DecoderException ex) { //bouncy castle is inconsistent and throws a single unchecked exception
+            throw new PGPException("Cannot decode message. Is it encrypted?", ex);
+        } finally {
+            if (decoded != null) {
+                decoded.close();
+            }
+        }
     }
 
     /** Regroups a datapacket that can be decrypted and the matching private key. */
