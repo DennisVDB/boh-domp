@@ -27,7 +27,7 @@ public abstract class DialogueMessage implements Parcelable {
      * Enumeration representing the state of a message.
      */
     public static enum MessageStatus {
-        SENT, DELIVERED, IN_TRANSIT, FAILED
+        SENT, DELIVERED, IN_TRANSIT, FAILED, ENCRYPTION_FAILED
     }
 
     /**
