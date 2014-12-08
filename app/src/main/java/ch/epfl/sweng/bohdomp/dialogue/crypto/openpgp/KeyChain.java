@@ -2,8 +2,6 @@ package ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp;
 
 import java.util.List;
 
-import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
-
 /**
  * A key chain is a collection of key rings, i.e. several master keys with
  * their sub-keys.

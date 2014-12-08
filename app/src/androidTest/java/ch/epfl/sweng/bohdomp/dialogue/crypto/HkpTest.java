@@ -14,7 +14,7 @@ import ch.epfl.sweng.bohdomp.dialogue.crypto.hkp.KeyNotFoundException;
  */
 public class HkpTest extends AndroidTestCase {
 
-    private final Client mClient = new Client("keyserver.ubuntu.com");
+    private final Client mClient = new Client("pgp.mit.edu");
 
     public void testInvalidHost() throws Exception {
         Client invalid = new Client("www.invalid.example");

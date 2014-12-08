@@ -53,7 +53,7 @@ public class SecretKeyChain extends SecretKeyLike implements KeyChain<SecretKeyR
 
     @Override
     protected PGPPrivateKey extractPrivateKey(long id, char[] passphrase)
-            throws PGPException, IncorrectPassphraseException {
+        throws PGPException, IncorrectPassphraseException {
 
         for (SecretKeyRing ring: getKeyRings()) {
             PGPPrivateKey p = ring.extractPrivateKey(id, passphrase);

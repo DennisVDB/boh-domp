@@ -1,12 +1,10 @@
 package ch.epfl.sweng.bohdomp.dialogue.crypto;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import junit.framework.Assert;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPUtil;
 
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.IncorrectPassphraseException;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.PublicKey;
