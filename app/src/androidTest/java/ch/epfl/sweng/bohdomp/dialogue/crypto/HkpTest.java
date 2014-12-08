@@ -13,6 +13,7 @@ import ch.epfl.sweng.bohdomp.dialogue.crypto.hkp.KeyNotFoundException;
  * Tests hkp key exchange functionality
  */
 public class HkpTest extends AndroidTestCase {
+
     private final Client mClient = new Client("keyserver.ubuntu.com");
 
     public void testInvalidHost() throws Exception {
@@ -37,4 +38,5 @@ public class HkpTest extends AndroidTestCase {
     public void testLookupKey() throws Exception {
         mClient.lookupKeyChain(TestKeyData.FINGERPRINT);
     }
+    
 }
