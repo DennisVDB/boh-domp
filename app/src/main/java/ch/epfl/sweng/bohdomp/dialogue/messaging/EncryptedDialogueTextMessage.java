@@ -14,21 +14,11 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
  * The message is encrypted only when it is first needed.
  */
 public class EncryptedDialogueTextMessage extends DialogueMessage {
-    public static final Parcelable.Creator<EncryptedDialogueTextMessage> CREATOR =
-            new Parcelable.Creator<EncryptedDialogueTextMessage>() {
-                public EncryptedDialogueTextMessage createFromParcel(Parcel source) {
-                    return new EncryptedDialogueTextMessage(source);
-                }
-
-                public EncryptedDialogueTextMessage[] newArray(int size) {
-                    return new EncryptedDialogueTextMessage[size];
-                }
-            };
     private Context mContext;
+
     private String mMessageBody;
     private TextMessageBody mEncryptedBody;
     private boolean mHasBeenEncrypted;
-
     public EncryptedDialogueTextMessage(Context context, Contact contact, Contact.ChannelType channel,
                                         Contact.PhoneNumber phoneNumber, String messageBody,
                                         MessageDirection messageDirection) {
@@ -61,11 +51,6 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
         return mEncryptedBody;
     }
 
-    private void encryptBody() {
-        mEncryptedBody = Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT);
-        mHasBeenEncrypted = true;
-    }
-
     @Override
     public MessageBody getPlainTextBody() {
         return super.getPlainTextBody();
@@ -95,5 +80,21 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
         // Null mMessageBody
         dest.writeParcelable(mEncryptedBody, flags);
         dest.writeByte(mHasBeenEncrypted ? (byte) 1 : (byte) 0);
+    }
+
+    public static final Parcelable.Creator<EncryptedDialogueTextMessage> CREATOR =
+            new Parcelable.Creator<EncryptedDialogueTextMessage>() {
+                public EncryptedDialogueTextMessage createFromParcel(Parcel source) {
+                    return new EncryptedDialogueTextMessage(source);
+                }
+
+                public EncryptedDialogueTextMessage[] newArray(int size) {
+                    return new EncryptedDialogueTextMessage[size];
+                }
+            };
+
+    private void encryptBody() {
+        mEncryptedBody = Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT);
+        mHasBeenEncrypted = true;
     }
 }
