@@ -3,10 +3,13 @@ package ch.epfl.sweng.bohdomp.dialogue.messaging;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.Crypto;
+import ch.epfl.sweng.bohdomp.dialogue.crypto.CryptoException;
 import ch.epfl.sweng.bohdomp.dialogue.crypto.KeyManager;
+import ch.epfl.sweng.bohdomp.dialogue.data.DefaultDialogData;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -95,7 +98,13 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
             };
 
     private void encryptBody() {
-        mEncryptedBody = new TextMessageBody(Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT));
+        try {
+            mEncryptedBody = new TextMessageBody(Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT));
+        } catch (CryptoException e) {
+            Log.e("ENCRYPTION", "encryption failed", e);
+            DefaultDialogData.getInstance().setMessageStatus(this, MessageStatus.ENCRYPTION_FAILED);
+        }
+
         mHasBeenEncrypted = true;
     }
 }
