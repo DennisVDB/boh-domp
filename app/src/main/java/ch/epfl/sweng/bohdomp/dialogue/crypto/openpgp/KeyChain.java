@@ -33,4 +33,10 @@ public abstract class KeyChain<T extends KeyRing<?>> {
         return null;
     }
 
+    /** Returns a new keychain with the given keyring added. */
+    abstract public KeyChain<T> add(T ring);
+
+    /** Returns an ascii-armored representation of this key chain. */
+    abstract public String toArmored();
+
 }

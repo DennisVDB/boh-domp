@@ -15,9 +15,10 @@ import ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp.SecretKeyRing;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.TextMessageBody;
 
 /**
- * Created by dennis on 05/12/14.
+ * Entry point for using cryptographic functions.
  */
 public class Crypto {
+
     public static TextMessageBody encrypt(Context context, String message, String fingerprint) {
         KeyManager keyManager = new KeyManager(context);
 
@@ -31,13 +32,15 @@ public class Crypto {
         }
 
         if (keyRing == null) {
-                throw new NoSuchElementException("No public key matching the fingerprint \"" + fingerprint + "\" can be found.");
-            }
+            throw new NoSuchElementException("No public key matching the fingerprint \"" + fingerprint
+                    + "\" can be found.");
+        }
 
-            List<PublicKey> encryptionKeys = keyRing.getEncryptionKeys();
-            if (encryptionKeys.size() == 0) {
-                throw new NoSuchElementException("No public keys of fingerprint \"" + fingerprint + "\" support encryption.");
-            }
+        List<PublicKey> encryptionKeys = keyRing.getEncryptionKeys();
+        if (encryptionKeys.size() == 0) {
+            throw new NoSuchElementException("No public keys of fingerprint \"" + fingerprint
+                    + "\" support encryption.");
+        }
 
         String encryptedMessage = null;
         try {
@@ -49,7 +52,9 @@ public class Crypto {
         return new TextMessageBody(encryptedMessage);
     }
 
-    public static TextMessageBody decrypt(Context context, String message) throws IOException, PGPException, IncorrectPassphraseException {
+    public static TextMessageBody decrypt(Context context, String message) throws IOException, PGPException,
+        IncorrectPassphraseException {
+
         KeyManager keyManager = new KeyManager(context);
 
         String fingerprint = KeyManager.FINGERPRINT; //TODO retrieve fingerprint associated to private key
@@ -58,11 +63,13 @@ public class Crypto {
         SecretKeyRing keyRing = keyManager.getSecretKeyChain().getKeyRing(fingerprint);
 
         if (keyRing == null) {
-            throw new NoSuchElementException("No public key matching the fingerprint \"" + fingerprint + "\" can be found.");
+            throw new NoSuchElementException("No public key matching the fingerprint \"" + fingerprint
+                    + "\" can be found.");
         }
 
         String decryptedMessage = keyRing.decrypt(message, passphrase);
 
         return new TextMessageBody(decryptedMessage);
     }
+
 }
