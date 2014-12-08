@@ -1,6 +1,8 @@
 package ch.epfl.sweng.bohdomp.dialogue.crypto.openpgp;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
@@ -15,7 +17,7 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 /**
  * A collection of all secret keys.
  */
-public class SecretKeyChain extends KeyChain<SecretKeyRing> {
+public class SecretKeyChain extends SecretKeyLike implements KeyChain<SecretKeyRing> {
 
     private final PGPSecretKeyRingCollection mUnderlying;
 
@@ -34,6 +36,33 @@ public class SecretKeyChain extends KeyChain<SecretKeyRing> {
         }
 
         return rings;
+    }
+
+    public SecretKeyRing getKeyRing(String fingerprint) {
+        Contract.throwIfArgNull(fingerprint, "fingerprint");
+
+        for (SecretKeyRing ring : getKeyRings()) {
+            for (Key key : ring.getKeys()) {
+                if (key.getFingerprint().equals(FingerprintUtils.fromString(fingerprint))) {
+                    return ring;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected PGPPrivateKey extractPrivateKey(long id, char[] passphrase)
+            throws PGPException, IncorrectPassphraseException {
+
+        for (SecretKeyRing ring: getKeyRings()) {
+            PGPPrivateKey p = ring.extractPrivateKey(id, passphrase);
+            if (p != null) {
+                return p;
+            }
+        }
+
+        return null;
     }
 
     public SecretKeyChain add(SecretKeyRing ring) {

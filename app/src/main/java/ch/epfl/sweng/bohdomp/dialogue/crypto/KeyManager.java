@@ -140,13 +140,13 @@ public class KeyManager {
     }*/
 
     public PublicKeyChain getPublicKeyChain()
-        throws FileNotFoundException, IOException, PGPException {
+        throws IOException, PGPException {
         //return getKeyChain(PUBLIC_KEY_RING, new PublicKeyChainBuilder());
         return new PublicKeyChainBuilder().fromString(PUBLIC_KEY_RING);
     }
 
     public SecretKeyChain getSecretKeyChain()
-        throws FileNotFoundException, IOException, PGPException {
+        throws IOException, PGPException {
         //return getKeyChain(SECRET_KEY_RING, new SecretKeyChainBuilder());
         return new SecretKeyChainBuilder().fromString(SECRET_KEY_RING);
     }

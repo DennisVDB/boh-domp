@@ -15,7 +15,7 @@ import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 /**
  * A collection of all public keys.
  */
-public class PublicKeyChain extends KeyChain<PublicKeyRing> {
+public class PublicKeyChain implements KeyChain<PublicKeyRing> {
 
     private final PGPPublicKeyRingCollection mUnderlying;
 
@@ -34,6 +34,19 @@ public class PublicKeyChain extends KeyChain<PublicKeyRing> {
         }
 
         return rings;
+    }
+
+    public PublicKeyRing getKeyRing(String fingerprint) {
+        Contract.throwIfArgNull(fingerprint, "fingerprint");
+
+        for (PublicKeyRing ring : getKeyRings()) {
+            for (Key key : ring.getKeys()) {
+                if (key.getFingerprint().equals(FingerprintUtils.fromString(fingerprint))) {
+                    return ring;
+                }
+            }
+        }
+        return null;
     }
 
     public PublicKeyChain add(PublicKeyRing ring) {
