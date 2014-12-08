@@ -63,6 +63,7 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+
         /*
         We can't put the context needed to encrypt the body
         to the parcel therefore we encrypt the body when we
@@ -94,7 +95,7 @@ public class EncryptedDialogueTextMessage extends DialogueMessage {
             };
 
     private void encryptBody() {
-        mEncryptedBody = Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT);
+        mEncryptedBody = new TextMessageBody(Crypto.encrypt(mContext, mMessageBody, KeyManager.FINGERPRINT));
         mHasBeenEncrypted = true;
     }
 }
