@@ -1,6 +1,13 @@
 package ch.epfl.sweng.bohdomp.dialogue.data;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Telephony;
+import android.util.Log;
+
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,12 +18,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ch.epfl.sweng.bohdomp.dialogue.conversation.ChannelType;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.Conversation;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.ConversationListener;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.DialogueConversation;
 import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.Contact;
+import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.ContactFactory;
+import ch.epfl.sweng.bohdomp.dialogue.conversation.contact.PhoneNumber;
+import ch.epfl.sweng.bohdomp.dialogue.exceptions.InvalidNumberException;
 import ch.epfl.sweng.bohdomp.dialogue.ids.ConversationId;
 import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueMessage;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.DialogueTextMessage;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.MessageBody;
+import ch.epfl.sweng.bohdomp.dialogue.messaging.TextMessageBody;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
 
 /**
@@ -210,6 +224,40 @@ public final class DefaultDialogData implements DialogueData {
         b.putParcelableArrayList(CONVERSATION, new ArrayList<Conversation>(mConversations.values()));
 
         return b;
+    }
+
+    @Override
+    public void retrieveOldSms(Context context) throws InvalidNumberException {
+        Log.d("BLA", "no");
+
+        Contract.throwIfArgNull(context, "context");
+
+        Uri uri = Telephony.Sms.CONTENT_URI;
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+
+        ContactFactory contactFactory = new ContactFactory(context);
+        DialogueData dialogData = DefaultDialogData.getInstance();
+
+        while(cursor.moveToNext()) {
+            Log.d("BLA", "yes");
+            PhoneNumber phoneNumber = new PhoneNumber(cursor.getString(cursor.getColumnIndex(Telephony.Sms.ADDRESS)),
+                    PhoneNumber.Tag.MOBILE);
+            Contact contact = contactFactory.contactFromNumber(phoneNumber.getNumber());
+
+            String body = cursor.getString(cursor.getColumnIndex(Telephony.Sms.BODY));
+
+//            DateTime time = new DateTime(cursor.getString(cursor.getColumnIndex(Telephony.Sms.DATE_SENT)));
+            DateTime time = new DateTime("141820065");
+
+            String protocol = cursor.getString(cursor.getColumnIndex(Telephony.Sms.PROTOCOL));
+
+            DialogueMessage message = new DialogueTextMessage(contact, ChannelType.SMS,
+                    phoneNumber, body,
+                    protocol == null ? DialogueMessage.MessageDirection.OUTGOING : DialogueMessage.MessageDirection.INCOMING,
+                    DialogueMessage.MessageStatus.DELIVERED, time);
+
+            dialogData.addMessageToConversation(message);
+        }
     }
 
     /**

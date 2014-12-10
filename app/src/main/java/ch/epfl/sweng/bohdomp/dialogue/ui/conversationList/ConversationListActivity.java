@@ -39,6 +39,7 @@ import ch.epfl.sweng.bohdomp.dialogue.data.DialogueData;
 import ch.epfl.sweng.bohdomp.dialogue.data.DialogueDataListener;
 import ch.epfl.sweng.bohdomp.dialogue.data.StorageManager;
 import ch.epfl.sweng.bohdomp.dialogue.exceptions.FingerprintInsertionException;
+import ch.epfl.sweng.bohdomp.dialogue.exceptions.InvalidNumberException;
 import ch.epfl.sweng.bohdomp.dialogue.ui.conversation.ConversationActivity;
 import ch.epfl.sweng.bohdomp.dialogue.ui.newConversation.NewConversationActivity;
 import ch.epfl.sweng.bohdomp.dialogue.utils.Contract;
@@ -58,7 +59,7 @@ public class ConversationListActivity extends Activity implements DialogueDataLi
     private AlertDialog mDialogDeleteAll;
     private AlertDialog mDialogNoNfc;
 
-    private String myPackageName;
+    private String      myPackageName;
 
     private DialogueData mData;
     private ContactFactory mContactFactory;
@@ -262,6 +263,11 @@ public class ConversationListActivity extends Activity implements DialogueDataLi
         mChangeDefaultAppButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
+                    DefaultDialogData.getInstance().retrieveOldSms(getApplicationContext());
+                } catch (InvalidNumberException e) {
+                    e.printStackTrace();
+                }
                 Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
                 intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
                 startActivity(intent);

@@ -84,6 +84,26 @@ public abstract class DialogueMessage implements Parcelable {
         this.mId = IdManager.getInstance().newDialogueMessageId();
     }
 
+    DialogueMessage(Contact contact, ChannelType channel, PhoneNumber phoneNumber,
+                    String messageBody, MessageDirection messageDirection, MessageStatus status,
+                    boolean isDataMessage, DateTime time) {
+
+        Contract.throwIfArgNull(contact, "contact");
+        Contract.throwIfArgNull(messageBody, "message body");
+        Contract.throwIfArgNull(messageDirection, "message status");
+
+        this.mContact = contact;
+        this.mChannel = channel;
+        this.mPhoneNumber = phoneNumber;
+        this.mBody = newBody(messageBody);
+        this.mTimestamp = time;
+        this.mIsReadStatus = false;
+        this.mDirection = messageDirection;
+        this.mStatus = status;
+        this.mIsDataMessage = isDataMessage;
+        this.mId = IdManager.getInstance().newDialogueMessageId();
+    }
+
     /**
      * Getter for the mContact message
      * @return the mContact whose message is
