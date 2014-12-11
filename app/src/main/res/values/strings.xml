@@ -43,5 +43,6 @@
     <string name="bringPhone">Please bring your phone together</string>
     <string name="cancel">Cancel</string>
     <string name="fingerprint">fingerprint</string>
+    <string name="messagePreview">Small Text</string>
 
 </resources>

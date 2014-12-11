@@ -75,11 +75,21 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/messagePreview"
+                android:id="@+id/messagePreview"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+            <TextView
                 android:id="@+id/contactChannels"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/allContactChannels"
-                android:textSize="12sp"
+                android:textSize="8sp"
                 android:textColor="#666666"/>
 
         </LinearLayout>

@@ -39,6 +39,7 @@ public class ConversationListAdapter extends BaseAdapter{
         protected TextView contactName;
         protected TextView contactChannels;
         protected TextView lastMessage;
+        protected TextView messagePreview;
         protected TextView unRead;
     }
 
@@ -137,6 +138,7 @@ public class ConversationListAdapter extends BaseAdapter{
         viewHolder.contactName = (TextView) convertView.findViewById(R.id.contactName);
         viewHolder.contactChannels = (TextView) convertView.findViewById(R.id.contactChannels);
         viewHolder.lastMessage = (TextView) convertView.findViewById(R.id.contactLastMessage);
+        viewHolder.messagePreview = (TextView) convertView.findViewById(R.id.messagePreview);
         viewHolder.unRead = (TextView) convertView.findViewById(R.id.unReadDot);
 
         return viewHolder;
@@ -163,7 +165,11 @@ public class ConversationListAdapter extends BaseAdapter{
 
         if (unread) {
             viewHolder.unRead.setVisibility(View.VISIBLE);
+
         }
+
+        String previewMessage = c.getMessages().get(c.getMessageCount() - 1).getPlainTextBody().getMessageBody();
+        viewHolder.messagePreview.setText(previewMessage);
 
         viewHolder.lastMessage.setText(c.getLastConversationActivityString(mContext));
     }
